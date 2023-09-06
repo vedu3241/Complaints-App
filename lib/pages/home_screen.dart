@@ -3,6 +3,8 @@ import 'package:logi_regi/components/reportForm.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../components/main_drawer.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, required this.userId});
   final String userId;
@@ -12,6 +14,8 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
+        backgroundColor: const Color.fromARGB(255, 255, 104, 35),
+        foregroundColor: Colors.black,
         actions: [
           InkWell(
             onTap: () async {
@@ -50,7 +54,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      // drawer: const MainDrawer(),
+      drawer: MainDrawer(userId: userId),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,

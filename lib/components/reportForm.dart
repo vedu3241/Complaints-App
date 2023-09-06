@@ -23,10 +23,11 @@ class _ReportFormState extends State<ReportForm> {
   String _selectedCategory = "Emergency";
   final _formKey = GlobalKey<FormState>();
   File? _imageFile;
-
   double? lat;
   double? long;
   String? address;
+
+  bool isShowImage = false;
 
   Future<void> _pickImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -246,18 +247,91 @@ class _ReportFormState extends State<ReportForm> {
             "Found Problem?? Report Us!",
             style: TextStyle(fontSize: 18),
           ),
+          // if (isShowImage)
           if (_imageFile != null)
             Image.file(
               _imageFile!,
               height: 200,
               width: 200,
             ),
+
+          // if (!isShowImage)
+          //   Container(
+          //     width: 200,
+          //     height: 200,
+          //     color: const Color.fromARGB(255, 201, 197, 197),
+          //     child: const Center(
+          //       child: Text(
+          //         "No Image",
+          //         style: TextStyle(fontWeight: FontWeight.bold),
+          //       ),
+          //     ),
+          //   ),
           ElevatedButton(
             onPressed: () {
               _pickImage(ImageSource.camera);
             },
-            child: const Text("Click Image"),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.yellow),
+            ),
+            child: const Text(
+              "Click Image",
+              style: TextStyle(color: Colors.black),
+            ),
           ),
+          // SizedBox(
+          //   width: 160,
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       if (_imageFile != null) {
+          //         setState(() {
+          //           isShowImage = !isShowImage;
+          //         });
+          //       } else {
+          //         showDialog(
+          //           context: context,
+          //           builder: (ctx) => AlertDialog(
+          //             title: const Text("Error"),
+          //             content: const Text("Click the image first"),
+          //             actions: [
+          //               TextButton(
+          //                 onPressed: () {
+          //                   Navigator.pop(context);
+          //                 },
+          //                 child: const Text("Okay"),
+          //               )
+          //             ],
+          //           ),
+          //         );
+          //       }
+          //     },
+          //     style: ButtonStyle(
+          //       backgroundColor:
+          //           MaterialStateProperty.all<Color>(Colors.orange),
+          //       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          //         RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(
+          //               40.0), // Adjust the radius as needed
+          //         ),
+          //       ),
+          //     ),
+          //     child: const Center(
+          //       child: Row(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         children: [
+          //           Icon(Icons.remove_red_eye),
+          //           SizedBox(
+          //             width: 10,
+          //           ),
+          //           Text(
+          //             "Image Preview",
+          //             style: TextStyle(color: Colors.black),
+          //           )
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
 
           DropdownButton(
             value: _selectedCategory,

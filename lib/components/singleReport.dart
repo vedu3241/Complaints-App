@@ -46,3 +46,5 @@ class SingleReport extends StatelessWidget {
     );
   }
 }
+
+//Idea: change color as per status of report red for pending and greeen when in progress

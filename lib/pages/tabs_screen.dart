@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:logi_regi/pages/demo.dart';
 import 'package:logi_regi/pages/home_screen.dart';
-import 'package:logi_regi/pages/my_profile.dart';
 import 'package:logi_regi/pages/reports_screen.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -32,9 +30,7 @@ class _TabsScreenState extends State<TabsScreen> {
         userId: widget.userId,
       );
     }
-    if (_selectedPageIndex == 2) {
-      activePage = const MyProfile();
-    }
+
     return Scaffold(
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(
@@ -44,8 +40,6 @@ class _TabsScreenState extends State<TabsScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
               icon: Icon(Icons.report), label: 'My Reports'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: 'My Profile'),
         ],
       ),
     );

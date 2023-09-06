@@ -51,6 +51,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
       final SharedPreferences sharedPreferences =
           await SharedPreferences.getInstance();
       sharedPreferences.setString("userId", userId);
+      sharedPreferences.setString("userEmail", user.email);
 
       message = responseData['message'];
 
