@@ -56,10 +56,27 @@ class HomeScreen extends StatelessWidget {
       ),
       drawer: MainDrawer(userId: userId),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          const SizedBox(
+            height: 50,
+          ),
           Center(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              // color: Color.fromARGB(255, 210, 188, 248),
+              child: const Text(
+                "Found Problem?? Report Us!",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 50,
+          ),
+          Container(
             child: ReportForm(userId: userId),
           ),
         ],

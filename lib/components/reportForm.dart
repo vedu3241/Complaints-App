@@ -5,9 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:logi_regi/models/complaint.dart';
-import 'package:logi_regi/pages/base.dart';
-import 'package:logi_regi/pages/reports_screen.dart';
-import 'package:logi_regi/pages/tabs_screen.dart';
+
 import 'package:quickalert/quickalert.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -20,23 +18,41 @@ class ReportForm extends StatefulWidget {
 }
 
 class _ReportFormState extends State<ReportForm> {
+  //set Default Category
   String _selectedCategory = "Emergency";
   final _formKey = GlobalKey<FormState>();
-  File? _imageFile;
   double? lat;
   double? long;
   String? address;
 
   bool isShowImage = false;
+  final List<XFile>? _imageFiles = [];
 
-  Future<void> _pickImage(ImageSource source) async {
+  // SINGLE IMAGE CODE
+  // Future<void> _pickImage(ImageSource source) async {
+  //   final picker = ImagePicker();
+  //   final pickedImage = await picker.pickImage(source: source);
+
+  //   if (pickedImage != null) {
+  //     setState(() {
+  //       _imageFile = File(pickedImage.path);
+  //     });
+  //   }
+  // }
+
+  // MULTIPLE IMAGE CODE
+  Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: source);
 
-    if (pickedImage != null) {
-      setState(() {
-        _imageFile = File(pickedImage.path);
-      });
+    final pickedImages = await picker.pickMultiImage();
+
+    if (pickedImages.isNotEmpty) {
+      _imageFiles!.addAll(
+        pickedImages.map(
+          (pickedImage) => XFile(pickedImage.path),
+        ),
+      );
+      setState(() {});
     }
   }
 
@@ -60,7 +76,7 @@ class _ReportFormState extends State<ReportForm> {
       );
     }
     //if image not found show error
-    else if (_imageFile == null) {
+    else if (_imageFiles == null) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -79,8 +95,8 @@ class _ReportFormState extends State<ReportForm> {
     } else {
       //Creating new complaint obj
       Complaint newComplaint = Complaint(
-          lat, long, _selectedCategory, widget.userId, address, _imageFile);
-
+          lat, long, _selectedCategory, widget.userId, address, _imageFiles);
+      print(newComplaint);
       //passing Complaint to make POST req
       report(newComplaint);
     }
@@ -115,10 +131,22 @@ class _ReportFormState extends State<ReportForm> {
     request.fields['Longitude'] = complaint.Longitude.toString();
     request.fields['Address'] = complaint.Address!;
 
-    if (_imageFile != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath('reportImg', _imageFile!.path),
-      );
+    // if (_imageFile != null) {
+    //   request.files.add(
+    //     await http.MultipartFile.fromPath('reportImg', _imageFile!.path),
+    //   );
+    // }
+
+    // MULTIPLE IMAGE CODE
+    print(_imageFiles == null);
+    if (_imageFiles != null) {
+      for (var imageFile in _imageFiles!) {
+        request.files.add(
+          await http.MultipartFile.fromPath('reportImages', imageFile.path),
+        );
+      }
+    } else {
+      print("error in report function :)");
     }
 
     var streamedResponse = await request.send();
@@ -231,6 +259,48 @@ class _ReportFormState extends State<ReportForm> {
     });
   }
 
+  void _showImagePreview() {
+    if (_imageFiles != null && _imageFiles!.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            //Make dialog BG transparent
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text('Image Preview'),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.builder(
+                itemCount: _imageFiles!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Image.file(
+                      File(_imageFiles![index].path),
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   void initState() {
     getLatLong();
@@ -241,161 +311,147 @@ class _ReportFormState extends State<ReportForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
-      child: Column(
-        children: [
-          const Text(
-            "Found Problem?? Report Us!",
-            style: TextStyle(fontSize: 18),
-          ),
-          // if (isShowImage)
-          if (_imageFile != null)
-            Image.file(
-              _imageFile!,
-              height: 200,
-              width: 200,
-            ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // if (_imageFile != null &&
+            //     showImagePreview) // Show image preview when 'showImagePreview' is true
+            //   Image.file(
+            //     _imageFile!,
+            //     height: 200,
+            //     width: 200,
+            //   ),
 
-          // if (!isShowImage)
-          //   Container(
-          //     width: 200,
-          //     height: 200,
-          //     color: const Color.fromARGB(255, 201, 197, 197),
-          //     child: const Center(
-          //       child: Text(
-          //         "No Image",
-          //         style: TextStyle(fontWeight: FontWeight.bold),
-          //       ),
-          //     ),
-          //   ),
-          ElevatedButton(
-            onPressed: () {
-              _pickImage(ImageSource.camera);
-            },
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.yellow),
-            ),
-            child: const Text(
-              "Click Image",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          // SizedBox(
-          //   width: 160,
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       if (_imageFile != null) {
-          //         setState(() {
-          //           isShowImage = !isShowImage;
-          //         });
-          //       } else {
-          //         showDialog(
-          //           context: context,
-          //           builder: (ctx) => AlertDialog(
-          //             title: const Text("Error"),
-          //             content: const Text("Click the image first"),
-          //             actions: [
-          //               TextButton(
-          //                 onPressed: () {
-          //                   Navigator.pop(context);
-          //                 },
-          //                 child: const Text("Okay"),
-          //               )
-          //             ],
-          //           ),
-          //         );
-          //       }
-          //     },
-          //     style: ButtonStyle(
-          //       backgroundColor:
-          //           MaterialStateProperty.all<Color>(Colors.orange),
-          //       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          //         RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(
-          //               40.0), // Adjust the radius as needed
-          //         ),
-          //       ),
-          //     ),
-          //     child: const Center(
-          //       child: Row(
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         children: [
-          //           Icon(Icons.remove_red_eye),
-          //           SizedBox(
-          //             width: 10,
-          //           ),
-          //           Text(
-          //             "Image Preview",
-          //             style: TextStyle(color: Colors.black),
-          //           )
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // ),
+            // Show the preview button when there are selected images
 
-          DropdownButton(
-            value: _selectedCategory,
-            items: const [
-              DropdownMenuItem(
-                value: "Emergency",
-                child: Text("Emergency"),
-              ),
-              DropdownMenuItem(
-                value: "Pot Hole",
-                child: Text("Pot Hole"),
-              ),
-              DropdownMenuItem(
-                value: "Dead Tree",
-                child: Text("Dead Tree"),
-              ),
-              DropdownMenuItem(
-                value: "Sewage Water",
-                child: Text("Sewage Water"),
-              ),
-            ],
-            onChanged: (value) {
-              if (value == null) {
-                return;
-              }
-              setState(() {
-                _selectedCategory = value.toString();
-              });
-            },
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          // Text("Lat : $lat"),
-          // Text("Long : $long"),
-          const Text("Address :"),
-          address != null
-              ? Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Text(
-                    "$address",
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              : const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
-                  child: CircularProgressIndicator(
-                    strokeWidth: 5.0,
+            if (_imageFiles != null && _imageFiles!.isNotEmpty)
+              ElevatedButton(
+                onPressed: _showImagePreview,
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Colors.green,
                   ),
                 ),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                print("validate");
-                submitReport();
-              } else {}
-            },
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-              child: Text("Report"),
+                child: const SizedBox(
+                  width: 130,
+                  child: Row(
+                    children: [
+                      Text(
+                        "Preview Images",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Spacer(),
+                      Icon(Icons.photo),
+                    ],
+                  ),
+                ),
+              ),
+
+            // if (_imageFiles != null)
+            //   SizedBox(
+            //     height: 200,
+            //     child: GridView.builder(
+            //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //         crossAxisCount: 2,
+            //         childAspectRatio: 1 / 2,
+            //         crossAxisSpacing: 15,
+            //         mainAxisSpacing: 0,
+            //       ),
+            //       itemCount: _imageFiles!.length,
+            //       itemBuilder: (BuildContext context, int index) {
+            //         return Image.file(
+            //           File(_imageFiles![index].path),
+            //         );
+            //       },
+            //     ),
+            //   ),
+
+            ElevatedButton(
+              onPressed: () {
+                _pickImage();
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.blue,
+                ),
+              ),
+              child: const SizedBox(
+                width: 120,
+                child: Row(
+                  children: [
+                    Text(
+                      "Select Images",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    Spacer(),
+                    Icon(Icons.image),
+                  ],
+                ),
+              ),
             ),
-          )
-        ],
+
+            DropdownButton(
+              value: _selectedCategory,
+              items: const [
+                DropdownMenuItem(
+                  value: "Emergency",
+                  child: Text("Emergency"),
+                ),
+                DropdownMenuItem(
+                  value: "Pot Hole",
+                  child: Text("Pot Hole"),
+                ),
+                DropdownMenuItem(
+                  value: "Dead Tree",
+                  child: Text("Dead Tree"),
+                ),
+                DropdownMenuItem(
+                  value: "Sewage Water",
+                  child: Text("Sewage Water"),
+                ),
+              ],
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() {
+                  _selectedCategory = value.toString();
+                });
+              },
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text("Address :"),
+            address != null
+                ? Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Text(
+                      "$address",
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5.0,
+                    ),
+                  ),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  print("validate");
+                  submitReport();
+                } else {}
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                child: Text("Report"),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -2,14 +2,16 @@
 
 import 'dart:io';
 
+import 'package:image_picker/image_picker.dart';
+
 class Complaint {
   String? ReporterId;
   String? Category;
   double? Latitude;
   double? Longitude;
   String? Address;
-  File? image;
+  List<XFile>? images;
 
   Complaint(this.Latitude, this.Longitude, this.Category, this.ReporterId,
-      this.Address, this.image);
+      this.Address, this.images);
 }
