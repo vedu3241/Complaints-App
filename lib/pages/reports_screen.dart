@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:logi_regi/components/main_drawer.dart';
-import 'package:logi_regi/components/singleReport.dart';
+import 'package:logi_regi/components/single_report.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -92,6 +92,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
       drawer: MainDrawer(userId: widget.userId),
       appBar: AppBar(
         title: const Text("My Reports"),
+        backgroundColor: Color.fromARGB(255, 112, 49, 213),
+        foregroundColor: Colors.white,
         actions: [
           InkWell(
             onTap: () async {
@@ -127,10 +129,4 @@ class _ReportsScreenState extends State<ReportsScreen> {
       body: isLoading ? loadingIndicator : (isData ? mainContent : noData),
     );
   }
-
-  // @override
-  // void dispose() {
-  //   // Cancel any ongoing work, dispose of resources here
-  //   super.dispose();
-  // }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:logi_regi/components/reportForm.dart';
+import 'package:logi_regi/components/report_form.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../components/main_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -14,8 +13,8 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
-        backgroundColor: const Color.fromARGB(255, 255, 104, 35),
-        foregroundColor: Colors.black,
+        backgroundColor: const Color.fromARGB(255, 133, 87, 211),
+        foregroundColor: Colors.white,
         actions: [
           InkWell(
             onTap: () async {
@@ -76,9 +75,7 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(
             height: 50,
           ),
-          Container(
-            child: ReportForm(userId: userId),
-          ),
+          ReportForm(userId: userId),
         ],
       ),
     );

@@ -28,18 +28,6 @@ class _ReportFormState extends State<ReportForm> {
   bool isShowImage = false;
   final List<XFile>? _imageFiles = [];
 
-  // SINGLE IMAGE CODE
-  // Future<void> _pickImage(ImageSource source) async {
-  //   final picker = ImagePicker();
-  //   final pickedImage = await picker.pickImage(source: source);
-
-  //   if (pickedImage != null) {
-  //     setState(() {
-  //       _imageFile = File(pickedImage.path);
-  //     });
-  //   }
-  // }
-
   // MULTIPLE IMAGE CODE
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -108,34 +96,11 @@ class _ReportFormState extends State<ReportForm> {
       Uri.parse('http://192.168.0.103:8000/submitReport'),
     );
 
-    // var res = await http.post(
-    //   Uri.parse('http://192.168.0.103:8000/submitReport'),
-    //   headers: <String, String>{
-    //     'Content-Type': 'application/json; charset=UTF-8; multipart/form-data',
-    //   },
-    //   body: jsonEncode(
-    //     <String, Object?>{
-    //       'ReporterId': complaint.ReporterId,
-    //       'Category': complaint.Category,
-    //       'Latitude': complaint.Latitude,
-    //       'Longitude': complaint.Longitude,
-    //       'Address': complaint.Address,
-    //       'reportImg': _imageFile,
-    //     },
-    //   ),
-    // );
-
     request.fields['ReporterId'] = complaint.ReporterId!;
     request.fields['Category'] = complaint.Category!;
     request.fields['Latitude'] = complaint.Latitude.toString();
     request.fields['Longitude'] = complaint.Longitude.toString();
     request.fields['Address'] = complaint.Address!;
-
-    // if (_imageFile != null) {
-    //   request.files.add(
-    //     await http.MultipartFile.fromPath('reportImg', _imageFile!.path),
-    //   );
-    // }
 
     // MULTIPLE IMAGE CODE
     print(_imageFiles == null);
@@ -314,16 +279,6 @@ class _ReportFormState extends State<ReportForm> {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            // if (_imageFile != null &&
-            //     showImagePreview) // Show image preview when 'showImagePreview' is true
-            //   Image.file(
-            //     _imageFile!,
-            //     height: 200,
-            //     width: 200,
-            //   ),
-
-            // Show the preview button when there are selected images
-
             if (_imageFiles != null && _imageFiles!.isNotEmpty)
               ElevatedButton(
                 onPressed: _showImagePreview,
@@ -341,38 +296,18 @@ class _ReportFormState extends State<ReportForm> {
                         style: TextStyle(color: Colors.white),
                       ),
                       Spacer(),
-                      Icon(Icons.photo),
+                      Icon(Icons.remove_red_eye),
                     ],
                   ),
                 ),
               ),
-
-            // if (_imageFiles != null)
-            //   SizedBox(
-            //     height: 200,
-            //     child: GridView.builder(
-            //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            //         crossAxisCount: 2,
-            //         childAspectRatio: 1 / 2,
-            //         crossAxisSpacing: 15,
-            //         mainAxisSpacing: 0,
-            //       ),
-            //       itemCount: _imageFiles!.length,
-            //       itemBuilder: (BuildContext context, int index) {
-            //         return Image.file(
-            //           File(_imageFiles![index].path),
-            //         );
-            //       },
-            //     ),
-            //   ),
-
             ElevatedButton(
               onPressed: () {
                 _pickImage();
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.blue,
+                  const Color.fromARGB(255, 112, 49, 213),
                 ),
               ),
               child: const SizedBox(
@@ -389,7 +324,6 @@ class _ReportFormState extends State<ReportForm> {
                 ),
               ),
             ),
-
             DropdownButton(
               value: _selectedCategory,
               items: const [
@@ -422,7 +356,10 @@ class _ReportFormState extends State<ReportForm> {
             const SizedBox(
               height: 10,
             ),
-            const Text("Address :"),
+            const Text(
+              "Address :",
+              style: TextStyle(fontSize: 20),
+            ),
             address != null
                 ? Padding(
                     padding:
@@ -430,6 +367,7 @@ class _ReportFormState extends State<ReportForm> {
                     child: Text(
                       "$address",
                       textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
                     ),
                   )
                 : const Padding(
@@ -445,6 +383,11 @@ class _ReportFormState extends State<ReportForm> {
                   submitReport();
                 } else {}
               },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  const Color.fromARGB(255, 112, 49, 213),
+                ),
+              ),
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 child: Text("Report"),

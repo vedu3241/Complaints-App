@@ -67,6 +67,7 @@ flutter:
   assets:
     - assets/images/locked.jpg
     - assets/images/unlocked.jpg
+    - assets/images/doodle_bg.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

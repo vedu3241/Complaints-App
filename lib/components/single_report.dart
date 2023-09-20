@@ -5,6 +5,7 @@ final formatter = DateFormat.yMd();
 
 class SingleReport extends StatelessWidget {
   const SingleReport({
+    super.key,
     required this.category,
     required this.address,
     required this.status,
@@ -22,7 +23,7 @@ class SingleReport extends StatelessWidget {
       height: 120,
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        color: const Color.fromARGB(255, 189, 160, 236),
+        color: const Color.fromARGB(255, 186, 164, 225),
         elevation: 4,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -32,13 +33,29 @@ class SingleReport extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(category), // Use category variable here
+                  Text(
+                    category,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w700),
+                  ), // Use category variable here
                   const Spacer(),
-                  Text(formatter.format(DateTime.parse(date))),
+                  Text(
+                    formatter.format(DateTime.parse(date)),
+                    style: const TextStyle(fontSize: 15),
+                  ),
                 ],
               ),
-              Text(address), // Use address variable here
-              Text(status), // Use status variable here
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                address,
+                style: const TextStyle(fontSize: 15),
+              ), // Use address variable here
+              const SizedBox(
+                height: 8,
+              ),
+              Text("Status: $status"), // Use status variable here
             ],
           ),
         ),

@@ -1,7 +1,5 @@
 // enum Category { , travel, leisure, work }
 
-import 'dart:io';
-
 import 'package:image_picker/image_picker.dart';
 
 class Complaint {

@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainDrawer extends StatefulWidget {
@@ -16,41 +14,14 @@ class MainDrawer extends StatefulWidget {
 class _MainDrawerState extends State<MainDrawer> {
   // Example mutable state
   bool isDrawerOpen = false;
-  var userEmail = null;
-  // void getEmail() async {
-  //   try {
-  //     print("in get email meth");
-  //     var res = await http.post(
-  //       Uri.parse('http://192.168.0.103:8000/getEmail'),
-  //       headers: <String, String>{
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: jsonEncode(
-  //         <String, Object?>{
-  //           'userId': widget.userId,
-  //         },
-  //       ),
-  //     );
-
-  //     // final responseData = jsonDecode(res.body);
-
-  //     if (res.statusCode == 201) {
-  //       print("found");
-  //     }
-  //     if (res.statusCode == 404) {
-  //       print("user not found");
-  //     }
-  //   } catch (error) {
-  //     print("Error: $error");
-  //   }
-  // }
+  var userEmail = '';
 
   void getEmail() async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     var obtainedId = sharedPreferences.getString('userEmail');
     setState(() {
-      userEmail = obtainedId;
+      userEmail = obtainedId!;
     });
   }
 
@@ -60,8 +31,6 @@ class _MainDrawerState extends State<MainDrawer> {
     super.initState();
   }
 
-//  Color.fromARGB(255, 34, 4, 81),
-//  Color.fromARGB(255, 133, 87, 211),
   @override
   Widget build(BuildContext context) {
     // print("Drawer opened");
