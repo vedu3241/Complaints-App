@@ -1,14 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:logi_regi/api_service.dart';
 import 'package:logi_regi/models/complaint.dart';
-
 import 'package:quickalert/quickalert.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class ReportForm extends StatefulWidget {
   const ReportForm({super.key, required this.userId});
@@ -91,55 +92,45 @@ class _ReportFormState extends State<ReportForm> {
   }
 
   Future report(Complaint complaint) async {
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('http://192.168.0.103:8000/submitReport'),
-    );
+    try {
+      final Response res =
+          await ApiService().submitReport(complaint, _imageFiles!);
 
-    request.fields['ReporterId'] = complaint.ReporterId!;
-    request.fields['Category'] = complaint.Category!;
-    request.fields['Latitude'] = complaint.Latitude.toString();
-    request.fields['Longitude'] = complaint.Longitude.toString();
-    request.fields['Address'] = complaint.Address!;
+      final responseData = jsonDecode(res.body);
+      String message;
 
-    // MULTIPLE IMAGE CODE
-    print(_imageFiles == null);
-    if (_imageFiles != null) {
-      for (var imageFile in _imageFiles!) {
-        request.files.add(
-          await http.MultipartFile.fromPath('reportImages', imageFile.path),
+      if (res.statusCode == 201) {
+        message = responseData['message'];
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text: message,
         );
+      } else if (res.statusCode == 500) {
+        message = responseData['message'];
+        print(message);
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: 'Oops...',
+          text: message,
+        );
+      } else if (res.statusCode == 400) {
+        message = responseData['message'];
+        print(message);
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          title: 'Oops...',
+          text: message,
+        );
+      } else {
+        print("Unexpected status code: ${res.statusCode}");
+        // Handle the unexpected response here
       }
-    } else {
-      print("error in report function :)");
-    }
-
-    var streamedResponse = await request.send();
-    var res = await http.Response.fromStream(streamedResponse);
-
-    final responseData = jsonDecode(res.body);
-    String message;
-
-    if (res.statusCode == 201) {
-      message = responseData['message'];
-      // ignore: use_build_context_synchronously
-      QuickAlert.show(
-        context: context,
-        // onConfirmBtnTap: () {},
-        type: QuickAlertType.success,
-        text: message,
-      );
-    }
-    //if found error
-    if (res.statusCode == 500) {
-      message = responseData['message'];
-      print(message);
-      QuickAlert.show(
-        context: context,
-        type: QuickAlertType.error,
-        title: 'Oops...',
-        text: message,
-      );
+    } catch (e) {
+      print("Error while processing response: $e");
+      // Handle the error gracefully, e.g., display an error message to the user
     }
   }
 
@@ -183,14 +174,31 @@ class _ReportFormState extends State<ReportForm> {
 
 //For convert lat long to address
   getAddress(lat, long) async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
-    setState(() {
-      address = placemarks[0].street! + " " + placemarks[0].country!;
-    });
+    // List<Placemark> placemarks =
+    //     await placemarkFromCoordinates(18.9512218, 72.8255601);
+    // setState(() {
+    //   address = placemarks[0].street! + " " + placemarks[0].country!;
+    // });
+    // print(address);
 
     // for (int i = 0; i < placemarks.length; i++) {
     //   print("INDEX $i ${placemarks[i]}");
     // }
+
+// 18.9512218, 72.8255601
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, long);
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          address = placemarks[0].street! + " " + placemarks[0].country!;
+        });
+        print(address);
+      } else {
+        print("No placemarks found at your co-ordinates");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
   getLatLong() {
@@ -324,6 +332,9 @@ class _ReportFormState extends State<ReportForm> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 8,
+            ),
             DropdownButton(
               value: _selectedCategory,
               items: const [
@@ -376,6 +387,9 @@ class _ReportFormState extends State<ReportForm> {
                       strokeWidth: 5.0,
                     ),
                   ),
+            const SizedBox(
+              height: 8,
+            ),
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {

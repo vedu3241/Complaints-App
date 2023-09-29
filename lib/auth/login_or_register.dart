@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:logi_regi/api_service.dart';
 import 'package:logi_regi/pages/base.dart';
 import 'package:logi_regi/pages/login_page.dart';
 import 'package:logi_regi/pages/register_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logi_regi/config/const.dart';
 
 import '../models/user.dart';
 
@@ -30,18 +33,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
   }
 
   Future saveLogin() async {
-    var res = await http.post(
-      Uri.parse('http://192.168.0.103:8000/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(
-        <String, String>{
-          'email': user.email,
-          'password': user.password,
-        },
-      ),
-    );
+    final Response res = await ApiService().saveLogin(user);
 
     final responseData = jsonDecode(res.body);
     String message;
@@ -89,19 +81,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
   }
 
   Future saveRegister() async {
-    var res = await http.post(
-      // 10.0.2.2
-      Uri.parse('http://192.168.0.103:8000/register'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(
-        <String, String>{
-          'email': user.email,
-          'password': user.password,
-        },
-      ),
-    );
+    final Response res = await ApiService().saveRegister(user);
     if (res.statusCode == 200) {
       // Navigating to login page
       if (context.mounted) {

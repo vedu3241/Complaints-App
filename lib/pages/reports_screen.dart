@@ -2,10 +2,11 @@ import 'dart:convert';
 // import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:logi_regi/api_service.dart';
 import 'package:logi_regi/components/main_drawer.dart';
 import 'package:logi_regi/components/single_report.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key, required this.userId});
@@ -22,18 +23,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   void getReports() async {
     try {
-      var res = await http.post(
-        Uri.parse('http://192.168.0.103:8000/getReports'),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(
-          <String, Object?>{
-            'userId': widget.userId,
-          },
-        ),
-      );
-
+      final Response res = await ApiService().getReports(widget.userId);
       final responseData = jsonDecode(res.body);
 
       if (res.statusCode == 200) {
@@ -56,10 +46,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
     }
   }
 
+  final int timeoutDuration = 3000; // 10 seconds
+
   @override
   void initState() {
     print("in report screen");
     getReports();
+
+    // Set a timeout for the loading
+    Future.delayed(Duration(milliseconds: timeoutDuration), () {
+      if (isLoading) {
+        // Loading is still ongoing after the timeout
+        setState(() {
+          isLoading = false; // Stop loading
+          isData = false; // Set isData to false
+        });
+      }
+    });
     super.initState();
   }
 
@@ -92,7 +95,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       drawer: MainDrawer(userId: widget.userId),
       appBar: AppBar(
         title: const Text("My Reports"),
-        backgroundColor: Color.fromARGB(255, 112, 49, 213),
+        backgroundColor: const Color.fromARGB(255, 112, 49, 213),
         foregroundColor: Colors.white,
         actions: [
           InkWell(
