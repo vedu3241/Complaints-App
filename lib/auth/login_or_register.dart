@@ -7,9 +7,7 @@ import 'package:logi_regi/api_service.dart';
 import 'package:logi_regi/pages/base.dart';
 import 'package:logi_regi/pages/login_page.dart';
 import 'package:logi_regi/pages/register_page.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:logi_regi/config/const.dart';
 
 import '../models/user.dart';
 
