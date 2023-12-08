@@ -69,29 +69,48 @@ class _MainDrawerState extends State<MainDrawer> {
           ),
           const ListTile(
             leading: Icon(
-              Icons.report,
+              Icons.question_mark_rounded,
               size: 26,
             ),
-            title: Text('Navigation'),
+            title: Text('FAQs & Support'),
           ),
-          // Example of state-dependent UI
           ListTile(
             leading: const Icon(
-              Icons.menu,
+              Icons.logout,
               size: 26,
             ),
-            title: const Text('Toggle Drawer State'),
-            onTap: () {
-              setState(() {
-                isDrawerOpen = !isDrawerOpen;
-              });
+            onTap: () async {
+              final SharedPreferences sharedPreferences =
+                  await SharedPreferences.getInstance();
+              sharedPreferences.remove('userId');
+              if (context.mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/base', // Replace with the route name for your login screen
+                  (route) => false, // Remove all previous routes from the stack
+                );
+              }
             },
+            title: Text('Log out'),
           ),
-          if (isDrawerOpen)
-            const ListTile(
-              title: Text('Additional Drawer Content'),
-              // Add your additional drawer content here
-            ),
+          // Example of state-dependent UI
+          // ListTile(
+          //   leading: const Icon(
+          //     Icons.menu,
+          //     size: 26,
+          //   ),
+          //   title: const Text('Toggle Drawer State'),
+          //   onTap: () {
+          //     setState(() {
+          //       isDrawerOpen = !isDrawerOpen;
+          //     });
+          //   },
+          // ),
+          // if (isDrawerOpen)
+          //   const ListTile(
+          //     title: Text('Additional Drawer Content'),
+          //     // Add your additional drawer content here
+          //   ),
         ],
       ),
     );

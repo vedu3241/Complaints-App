@@ -17,7 +17,6 @@ class App extends StatelessWidget {
       routes: {
         '/base': (context) => const Base(),
         '/loginOrReg': (context) => const LoginOrRegister(),
-        // Define more routes here
       },
     );
   }

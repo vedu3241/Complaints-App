@@ -5,78 +5,63 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/main_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.userId});
+  const HomeScreen(
+      {super.key, required this.userId, required this.changeIndex});
   final String userId;
+  final Function changeIndex;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home"),
-        backgroundColor: const Color.fromARGB(255, 133, 87, 211),
-        foregroundColor: Colors.white,
-        actions: [
-          InkWell(
-            onTap: () async {
-              final SharedPreferences sharedPreferences =
-                  await SharedPreferences.getInstance();
-              sharedPreferences.remove('userId');
-              if (context.mounted) {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (ctx) => const Base(),
-                //   ),
-                // );
-
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/base', // Replace with the route name for your login screen
-                  (route) => false, // Remove all previous routes from the stack
-                );
-              }
-            },
-            child: const Row(
-              children: [
-                Text(
-                  "Log Out",
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Icon(Icons.logout),
-                SizedBox(
-                  width: 12,
-                )
-              ],
-            ),
-          ),
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("LOGO"),
+          ],
+        ),
+        elevation: 0,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        foregroundColor: const Color.fromARGB(255, 26, 25, 25),
+        actions: const [
+          Icon(Icons.info_rounded),
+          SizedBox(
+            width: 20,
+          )
         ],
       ),
       drawer: MainDrawer(userId: userId),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(
-            height: 50,
-          ),
-          Center(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              // color: Color.fromARGB(255, 210, 188, 248),
-              child: const Text(
-                "Found Problem?? Report Us!",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                textAlign: TextAlign.center,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(25),
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                    // color: Color.fromARGB(255, 207, 201, 199),
+                    ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Found Problem??",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 30,
+                          color: Colors.deepOrange),
+                    ),
+                    Text(
+                      "Report us!!",
+                      style: TextStyle(fontSize: 25),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-          ReportForm(userId: userId),
-        ],
+            ReportForm(userId: userId, changeIndex: changeIndex),
+          ],
+        ),
       ),
     );
   }

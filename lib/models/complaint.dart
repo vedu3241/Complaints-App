@@ -8,8 +8,9 @@ class Complaint {
   double? Latitude;
   double? Longitude;
   String? Address;
+  String? Description;
   List<XFile>? images;
 
   Complaint(this.Latitude, this.Longitude, this.Category, this.ReporterId,
-      this.Address, this.images);
+      this.Address, this.images, this.Description);
 }

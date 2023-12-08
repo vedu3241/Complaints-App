@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -12,8 +11,10 @@ import 'package:quickalert/quickalert.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ReportForm extends StatefulWidget {
-  const ReportForm({super.key, required this.userId});
+  const ReportForm(
+      {super.key, required this.userId, required this.changeIndex});
   final String userId;
+  final Function changeIndex;
   @override
   State<ReportForm> createState() => _ReportFormState();
 }
@@ -25,6 +26,8 @@ class _ReportFormState extends State<ReportForm> {
   double? lat;
   double? long;
   String? address;
+  String? Description;
+  final TextEditingController _descriptionController = TextEditingController();
 
   bool isShowImage = false;
   final List<XFile>? _imageFiles = [];
@@ -47,6 +50,7 @@ class _ReportFormState extends State<ReportForm> {
 
   void submitReport() {
     //checking for null
+    // print(_imageFiles);
     if (lat == null || long == null || address == null) {
       showDialog(
         context: context,
@@ -83,8 +87,8 @@ class _ReportFormState extends State<ReportForm> {
       );
     } else {
       //Creating new complaint obj
-      Complaint newComplaint = Complaint(
-          lat, long, _selectedCategory, widget.userId, address, _imageFiles);
+      Complaint newComplaint = Complaint(lat, long, _selectedCategory,
+          widget.userId, address, _imageFiles, Description);
       print(newComplaint);
       //passing Complaint to make POST req
       report(newComplaint);
@@ -105,6 +109,7 @@ class _ReportFormState extends State<ReportForm> {
           context: context,
           type: QuickAlertType.success,
           text: message,
+          onConfirmBtnTap: widget.changeIndex(),
         );
       } else if (res.statusCode == 500) {
         message = responseData['message'];
@@ -282,132 +287,151 @@ class _ReportFormState extends State<ReportForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            if (_imageFiles != null && _imageFiles!.isNotEmpty)
+    return Container(
+      // decoration: BoxDecoration(color: Colors.deepPurpleAccent),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              if (_imageFiles != null && _imageFiles!.isNotEmpty)
+                ElevatedButton(
+                  onPressed: _showImagePreview,
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.green,
+                    ),
+                  ),
+                  child: const SizedBox(
+                    width: 130,
+                    child: Row(
+                      children: [
+                        Text(
+                          "Preview Images",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Spacer(),
+                        Icon(Icons.remove_red_eye),
+                      ],
+                    ),
+                  ),
+                ),
               ElevatedButton(
-                onPressed: _showImagePreview,
+                onPressed: () {
+                  _pickImage();
+                },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.green,
+                    const Color.fromARGB(255, 255, 87, 34),
                   ),
                 ),
                 child: const SizedBox(
-                  width: 130,
+                  width: 120,
                   child: Row(
                     children: [
                       Text(
-                        "Preview Images",
+                        "Select Images",
                         style: TextStyle(color: Colors.white),
                       ),
                       Spacer(),
-                      Icon(Icons.remove_red_eye),
+                      Icon(Icons.image),
                     ],
                   ),
                 ),
               ),
-            ElevatedButton(
-              onPressed: () {
-                _pickImage();
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  const Color.fromARGB(255, 112, 49, 213),
-                ),
+              const SizedBox(
+                height: 8,
               ),
-              child: const SizedBox(
-                width: 120,
-                child: Row(
-                  children: [
-                    Text(
-                      "Select Images",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Spacer(),
-                    Icon(Icons.image),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            DropdownButton(
-              value: _selectedCategory,
-              items: const [
-                DropdownMenuItem(
-                  value: "Emergency",
-                  child: Text("Emergency"),
-                ),
-                DropdownMenuItem(
-                  value: "Pot Hole",
-                  child: Text("Pot Hole"),
-                ),
-                DropdownMenuItem(
-                  value: "Dead Tree",
-                  child: Text("Dead Tree"),
-                ),
-                DropdownMenuItem(
-                  value: "Sewage Water",
-                  child: Text("Sewage Water"),
-                ),
-              ],
-              onChanged: (value) {
-                if (value == null) {
-                  return;
-                }
-                setState(() {
-                  _selectedCategory = value.toString();
-                });
-              },
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Text(
-              "Address :",
-              style: TextStyle(fontSize: 20),
-            ),
-            address != null
-                ? Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Text(
-                      "$address",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  )
-                : const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 5.0,
-                    ),
+              DropdownButton(
+                value: _selectedCategory,
+                items: const [
+                  DropdownMenuItem(
+                    value: "Emergency",
+                    child: Text("Emergency"),
                   ),
-            const SizedBox(
-              height: 8,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  print("validate");
-                  submitReport();
-                } else {}
-              },
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  const Color.fromARGB(255, 112, 49, 213),
+                  DropdownMenuItem(
+                    value: "Pot Hole",
+                    child: Text("Pot Hole"),
+                  ),
+                  DropdownMenuItem(
+                    value: "Dead Tree",
+                    child: Text("Dead Tree"),
+                  ),
+                  DropdownMenuItem(
+                    value: "Sewage Water",
+                    child: Text("Sewage Water"),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  setState(() {
+                    _selectedCategory = value.toString();
+                  });
+                },
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onChanged: (value) => setState(() {
+                    Description = value.toString();
+                  }),
+                  controller: _descriptionController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Description here..",
+                  ),
                 ),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                child: Text("Report"),
+              const Text(
+                "Address :",
+                style: TextStyle(fontSize: 20),
               ),
-            )
-          ],
+              address != null
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      child: Text(
+                        "$address",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 5.0,
+                      ),
+                    ),
+              const SizedBox(
+                height: 8,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  print(_descriptionController.text);
+                  if (_formKey.currentState!.validate()) {
+                    print("validate");
+                    submitReport();
+                  } else {}
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    const Color.fromARGB(255, 255, 87, 34),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  child: Text("Report"),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

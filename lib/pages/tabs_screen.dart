@@ -12,6 +12,11 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen> {
   int _selectedPageIndex = 0;
+  void changeIndex() {
+    _selectedPageIndex = 1;
+    setState(() {});
+  }
+
   void _selectedPage(int index) {
     setState(() {
       _selectedPageIndex = index;
@@ -22,6 +27,7 @@ class _TabsScreenState extends State<TabsScreen> {
   Widget build(BuildContext context) {
     Widget activePage = HomeScreen(
       userId: widget.userId,
+      changeIndex: changeIndex,
     );
     // Widget activePage = DemoScreen();
 

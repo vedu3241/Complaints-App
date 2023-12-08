@@ -7,7 +7,7 @@ import 'package:logi_regi/models/complaint.dart';
 import 'package:logi_regi/models/user.dart';
 
 class ApiService {
-  final baseUrl = 'http://192.168.0.103:8000';
+  final baseUrl = 'http://192.168.0.106:8000'; //Enter IPV4 add from CMD
 
   Future<Response> saveLogin(User user) async {
     var res = await http.post(
@@ -54,6 +54,7 @@ class ApiService {
     request.fields['Latitude'] = complaint.Latitude.toString();
     request.fields['Longitude'] = complaint.Longitude.toString();
     request.fields['Address'] = complaint.Address!;
+    request.fields['Description'] = complaint.Description!;
 
     for (var imageFile in imageFiles) {
       request.files.add(
