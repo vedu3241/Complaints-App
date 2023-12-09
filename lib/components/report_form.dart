@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -288,123 +289,164 @@ class _ReportFormState extends State<ReportForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // decoration: BoxDecoration(color: Colors.deepPurpleAccent),
+      width: 320,
       child: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (_imageFiles != null && _imageFiles!.isNotEmpty)
-                ElevatedButton(
-                  onPressed: _showImagePreview,
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.green,
-                    ),
-                  ),
-                  child: const SizedBox(
-                    width: 130,
-                    child: Row(
-                      children: [
-                        Text(
-                          "Preview Images",
-                          style: TextStyle(color: Colors.white),
+                InkWell(
+                  onTap: () {
+                    _showImagePreview();
+                  },
+                  child: DottedBorder(
+                    padding: const EdgeInsets.all(10),
+                    dashPattern: const [5, 5],
+                    color: Colors.blue,
+                    strokeWidth: 2,
+                    child: const SizedBox(
+                      width: double.infinity,
+                      height: 30,
+                      child: Center(
+                        child: Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Preview Images",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Icon(Icons.remove_red_eye),
+                            ],
+                          ),
                         ),
-                        Spacer(),
-                        Icon(Icons.remove_red_eye),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ElevatedButton(
-                onPressed: () {
+              const SizedBox(
+                height: 20,
+              ),
+              InkWell(
+                onTap: () {
                   _pickImage();
                 },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                    const Color.fromARGB(255, 255, 87, 34),
-                  ),
-                ),
-                child: const SizedBox(
-                  width: 120,
-                  child: Row(
-                    children: [
-                      Text(
-                        "Select Images",
-                        style: TextStyle(color: Colors.white),
+                child: DottedBorder(
+                  padding: const EdgeInsets.all(10),
+                  dashPattern: const [5, 5],
+                  color: Colors.orange,
+                  strokeWidth: 2,
+                  child: const SizedBox(
+                    width: double.infinity,
+                    height: 30,
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Select Images",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Icon(Icons.image, color: Colors.grey),
+                        ],
                       ),
-                      Spacer(),
-                      Icon(Icons.image),
-                    ],
+                    ),
                   ),
                 ),
               ),
               const SizedBox(
                 height: 8,
               ),
-              DropdownButton(
-                value: _selectedCategory,
-                items: const [
-                  DropdownMenuItem(
-                    value: "Emergency",
-                    child: Text("Emergency"),
+              SizedBox(
+                width: double.infinity,
+                child: DropdownButtonFormField(
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.black,
                   ),
-                  DropdownMenuItem(
-                    value: "Pot Hole",
-                    child: Text("Pot Hole"),
-                  ),
-                  DropdownMenuItem(
-                    value: "Dead Tree",
-                    child: Text("Dead Tree"),
-                  ),
-                  DropdownMenuItem(
-                    value: "Sewage Water",
-                    child: Text("Sewage Water"),
-                  ),
-                ],
-                onChanged: (value) {
-                  if (value == null) {
-                    return;
-                  }
-                  setState(() {
-                    _selectedCategory = value.toString();
-                  });
-                },
+                  // decoration: const InputDecoration(border: InputBorder.none),
+                  value: _selectedCategory,
+                  items: const [
+                    DropdownMenuItem(
+                      value: "Emergency",
+                      child: Text("Emergency"),
+                    ),
+                    DropdownMenuItem(
+                      value: "Pot Hole",
+                      child: Text("Pot Hole"),
+                    ),
+                    DropdownMenuItem(
+                      value: "Dead Tree",
+                      child: Text("Dead Tree"),
+                    ),
+                    DropdownMenuItem(
+                      value: "Sewage Water",
+                      child: Text("Sewage Water"),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) {
+                      return;
+                    }
+                    setState(() {
+                      _selectedCategory = value.toString();
+                    });
+                  },
+                ),
               ),
               const SizedBox(
-                height: 10,
+                height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  onChanged: (value) => setState(() {
-                    Description = value.toString();
-                  }),
-                  controller: _descriptionController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: "Description here..",
+              TextField(
+                onChanged: (value) => setState(() {
+                  Description = value.toString();
+                }),
+                controller: _descriptionController,
+                keyboardType: TextInputType.multiline,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10),
+                    ),
                   ),
+                  hintText: "Description here..",
                 ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
               const Text(
                 "Address :",
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500),
               ),
               address != null
                   ? Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         "$address",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(
+                            color: Color.fromARGB(179, 100, 98, 98),
+                            fontSize: 16),
                       ),
                     )
-                  : const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
+                  : const Center(
                       child: CircularProgressIndicator(
                         strokeWidth: 5.0,
                       ),
@@ -412,22 +454,31 @@ class _ReportFormState extends State<ReportForm> {
               const SizedBox(
                 height: 8,
               ),
-              ElevatedButton(
-                onPressed: () {
-                  print(_descriptionController.text);
-                  if (_formKey.currentState!.validate()) {
-                    print("validate");
-                    submitReport();
-                  } else {}
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                    const Color.fromARGB(255, 255, 87, 34),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    print(_descriptionController.text);
+                    if (_formKey.currentState!.validate()) {
+                      print("validate");
+                      submitReport();
+                    } else {}
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      Colors.orange,
+                    ),
                   ),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  child: Text("Report"),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: Center(
+                      child: Text(
+                        "Report Now",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ),
                 ),
               )
             ],

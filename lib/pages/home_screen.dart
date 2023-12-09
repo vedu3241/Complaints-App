@@ -1,5 +1,7 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:logi_regi/components/report_form.dart';
+import 'package:logi_regi/pages/info_page.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/main_drawer.dart';
@@ -23,9 +25,16 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         foregroundColor: const Color.fromARGB(255, 26, 25, 25),
-        actions: const [
-          Icon(Icons.info_rounded),
-          SizedBox(
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const InfoScreen(),
+              ));
+            },
+            child: const Icon(Icons.info_rounded),
+          ),
+          const SizedBox(
             width: 20,
           )
         ],
@@ -49,12 +58,15 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 30,
-                          color: Colors.deepOrange),
+                          color: Colors.orange),
                     ),
                     Text(
                       "Report us!!",
                       style: TextStyle(fontSize: 25),
                     ),
+                    SizedBox(
+                      height: 15,
+                    )
                   ],
                 ),
               ),

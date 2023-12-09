@@ -7,6 +7,7 @@ import 'package:logi_regi/api_service.dart';
 import 'package:logi_regi/components/main_drawer.dart';
 import 'package:logi_regi/components/myReportTile.dart';
 import 'package:logi_regi/components/single_report.dart';
+import 'package:logi_regi/pages/info_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportsScreen extends StatefulWidget {
@@ -123,9 +124,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
             Text("LOGO"),
           ],
         ),
-        actions: const [
-          Icon(Icons.info_rounded),
-          SizedBox(
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const InfoScreen(),
+              ));
+            },
+            child: const Icon(Icons.info_rounded),
+          ),
+          const SizedBox(
             width: 20,
           )
         ],
